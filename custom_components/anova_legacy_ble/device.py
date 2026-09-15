@@ -319,12 +319,12 @@ class AnovaLegacyDevice:
                 # 132 F must never be published as 132 C. On the first poll,
                 # wait for a valid unit response before accepting temperatures.
                 parsed_current = (
-                    self._parse_number(temp_raw)
+                    self._parse_temperature(temp_raw, self._known_unit)
                     if self._known_unit is not None
                     else None
                 )
                 parsed_target = (
-                    self._parse_number(target_raw)
+                    self._parse_temperature(target_raw, self._known_unit)
                     if self._known_unit is not None
                     else None
                 )
@@ -454,6 +454,23 @@ class AnovaLegacyDevice:
             return float(match.group(0))
         except ValueError:
             return None
+
+    @staticmethod
+    def _parse_temperature(value: str | None, unit: str) -> float | None:
+        """Parse a temperature and reject readings impossible for this appliance."""
+        parsed = AnovaLegacyDevice._parse_number(value)
+        if parsed is None:
+            return None
+
+        # Allow a little sensor tolerance outside the normal 0-100 C cooker
+        # range while still catching classic unit-mismatch artifacts (132 C).
+        low, high = ((-10.0, 110.0) if unit == "C" else (14.0, 230.0))
+        if not low <= parsed <= high:
+            _LOGGER.warning(
+                "Ignoring implausible Anova temperature %.2f %s", parsed, unit
+            )
+            return None
+        return parsed
 
     @staticmethod
     def _parse_unit(value: str | None) -> str | None:
