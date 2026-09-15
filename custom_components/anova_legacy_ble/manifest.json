@@ -1,0 +1,23 @@
+{
+  "domain": "anova_legacy_ble",
+  "name": "Anova Legacy BLE",
+  "version": "0.1.0",
+  "config_flow": true,
+  "dependencies": [
+    "bluetooth_adapters"
+  ],
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "bluetooth": [
+    {
+      "service_uuid": "0000ffe0-0000-1000-8000-00805f9b34fb",
+      "connectable": true
+    },
+    {
+      "local_name": "Anova*",
+      "connectable": true
+    }
+  ],
+  "requirements": [],
+  "documentation": "https://github.com/anova-culinary/developer-project-a2a3"
+}

@@ -1,0 +1,31 @@
+{
+  "title": "Anova Legacy BLE",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Anova Legacy BLE",
+        "description": "Power on the cooker and press its Bluetooth button so the Bluetooth light is blinking. Choose it below. If it is not listed, choose manual entry.",
+        "data": {
+          "address": "Cooker"
+        }
+      },
+      "manual": {
+        "title": "Enter Bluetooth address",
+        "description": "Enter the Bluetooth address Home Assistant sees for the cooker. A normal address looks like AA:BB:CC:DD:EE:FF.",
+        "data": {
+          "address": "Bluetooth address"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Add {name}",
+        "description": "Found {name} at {address}. Keep the cooker powered on and its Bluetooth light blinking for the first connection."
+      }
+    },
+    "error": {
+      "invalid_address": "Enter a Bluetooth address."
+    },
+    "abort": {
+      "already_configured": "This cooker is already configured."
+    }
+  }
+}

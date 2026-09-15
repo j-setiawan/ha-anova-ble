@@ -26,20 +26,27 @@ The known protocol uses:
 
 ### Manual installation
 
-1. Copy the folder `custom_components/anova_legacy_ble` into your Home Assistant configuration directory so you have `/config/custom_components/anova_legacy_ble/manifest.json`.
+1. Copy the folder:
+
+   `custom_components/anova_legacy_ble`
+
+   into your Home Assistant configuration directory so you have:
+
+   `/config/custom_components/anova_legacy_ble/manifest.json`
+
 2. Restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**.
 4. Search for **Anova Legacy BLE**.
 
 ### HACS custom repository
 
-Add this repository under **HACS → Integrations → Custom repositories**, choosing **Integration** as the repository type. Public repository visibility is recommended for straightforward HACS installation.
+If you place this project in a GitHub repository later, HACS can install it as a custom integration. Add the repository URL under **HACS → Integrations → Custom repositories**.
 
 ## Bluetooth setup / pairing
 
 ### Recommended first attempt: do NOT pre-pair
 
-Anova's published Python reference client connects directly over BLE and does not explicitly pair/bond first.
+Anova's published Python reference client connects directly over BLE and does not explicitly pair/bond first. Start here:
 
 1. Put the cooker in water high enough to satisfy its minimum-water sensor.
 2. Plug the cooker in and power it on.
@@ -49,11 +56,11 @@ Anova's published Python reference client connects directly over BLE and does no
 6. If Home Assistant has seen the advertisement, select the Anova from the list.
 7. Finish setup while the cooker is still powered on and advertising.
 
-The first refresh opens a BLE connection and reads the cooker. If setup remains in a retrying state, leave the Anova powered on and press its Bluetooth button again.
+The first refresh opens a BLE connection and reads the cooker. If setup remains in "retrying" state, leave the Anova powered on and press its Bluetooth button again.
 
 ### ESPHome Bluetooth proxy
 
-A current ESP32 ESPHome Bluetooth proxy can make active BLE connections. The integration asks Home Assistant for the best **connectable** path to the cooker rather than opening its own scanner, so a proxy can be used.
+A normal current ESP32 ESPHome Bluetooth proxy can make active BLE connections. The integration deliberately asks Home Assistant for the best **connectable** path to the cooker rather than opening its own scanner, so a proxy can be used.
 
 Example ESPHome fragment:
 
@@ -68,9 +75,9 @@ You do not configure the Anova MAC address in ESPHome. Home Assistant routes the
 
 ### Do I need a Bluetooth PIN?
 
-Probably not. Historical Anova community guidance for the 2014 BLE cooker says it is meant to be connected from inside an app rather than paired from the operating system's normal Bluetooth-device screen. Anova's A2/A3 Python reference client also connects directly without performing a bonding step.
+Probably not. Historical Anova community guidance for the 2014 BLE cooker says it is meant to be connected **from inside an app**, rather than paired from the operating system's normal Bluetooth-device screen. Anova's current A2/A3 Python reference client also connects directly without performing a bonding step.
 
-A third-party Windows client documents PIN `0000` for its pairing workflow, so firmware/OS variations may exist. For this integration, do not start by pairing it in Windows/iOS/Android settings. Put the cooker in discoverable mode and let Home Assistant connect directly. If debug logs show an authentication or insufficient-encryption error, bonding support may need to be added.
+A newer third-party Windows client documents PIN `0000` for its pairing workflow, so there were clearly firmware/OS variations. For this Home Assistant integration, **do not start by trying to pair it in Windows/iOS/Android settings**. Put the cooker in discoverable mode and let Home Assistant connect directly. If the debug log shows an authentication or insufficient-encryption error, that tells us your unit really does require a bond and we can add a pairing-specific fallback.
 
 ## Entities
 
@@ -93,13 +100,19 @@ The exact entity IDs depend on the device name Home Assistant assigns.
 
 Every update uses one short BLE connection:
 
-1. Home Assistant selects the best adapter/proxy that can reach the device.
+1. Home Assistant selects the best adapter/proxy that can reach the MAC address.
 2. The integration connects.
 3. It subscribes to notifications on `FFE1`.
-4. It sends read commands such as `get id card`, `read unit`, `status`, `read set temp`, `read temp`, and `read timer`.
+4. It sends read commands such as:
+   - `get id card`
+   - `read unit`
+   - `status`
+   - `read set temp`
+   - `read temp`
+   - `read timer`
 5. It disconnects.
 
-Control operations similarly connect, send a command, and disconnect. This avoids permanently occupying an ESPHome proxy connection slot and avoids blocking the official app for long periods.
+Control operations similarly connect, send one command, and disconnect. This avoids permanently occupying an ESPHome proxy connection slot and avoids blocking the official app for long periods.
 
 ## Debug logging
 
@@ -122,9 +135,11 @@ Useful log messages include:
 - `Anova TX` commands
 - `Anova RX` responses
 
+If it fails, the most useful information to capture is the block beginning with the connection attempt and the first `Anova TX` / error lines. Bluetooth MAC addresses are not passwords, but you can redact the address before sharing the log if desired.
+
 ## Known uncertainties
 
-This is a best-effort initial implementation and has not yet been broadly tested across original Anova firmware revisions.
+This is intentionally a best-effort first build because it has not been tested against your exact cooker yet.
 
 1. Some original firmware revisions may require legacy bonding/PIN `0000` before allowing GATT access.
 2. Anova firmware may vary in whether write commands return acknowledgements. This integration does not require an acknowledgement for writes.
