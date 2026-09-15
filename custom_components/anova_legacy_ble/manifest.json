@@ -1,7 +1,7 @@
 {
   "domain": "anova_legacy_ble",
   "name": "Anova Legacy BLE",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "config_flow": true,
   "dependencies": [
     "bluetooth_adapters"
@@ -19,5 +19,5 @@
     }
   ],
   "requirements": [],
-  "documentation": "https://github.com/anova-culinary/developer-project-a2a3"
+  "documentation": "https://github.com/j-setiawan/ha-anova-ble"
 }

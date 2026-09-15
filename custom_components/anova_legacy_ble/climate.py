@@ -47,8 +47,14 @@ class AnovaClimate(AnovaEntity, ClimateEntity):
         return self.coordinator.data.target_temperature
 
     @property
-    def hvac_mode(self) -> HVACMode:
-        return HVACMode.HEAT if self.coordinator.data.running else HVACMode.OFF
+    def hvac_mode(self) -> HVACMode | None:
+        """Return unknown when running state has never been read successfully."""
+        running = self.coordinator.data.running
+        if running is True:
+            return HVACMode.HEAT
+        if running is False:
+            return HVACMode.OFF
+        return None
 
     @property
     def min_temp(self) -> float:
